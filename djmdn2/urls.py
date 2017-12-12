@@ -16,7 +16,26 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.conf.urls import include
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/', admin.site.urls)
 ]
+
+urlpatterns += [
+    url(r'^catalog/', include('catalog.urls')),
+]
+    
+    
+# keep this near the bottom... hard redirect to keep catalog as only app
+from django.views.generic import RedirectView
+urlpatterns += [
+    url(r'^$', RedirectView.as_view(url='/catalog/', permanent=True)),
+]
+
+# django doesn't serve up static files by default, it's nice to
+# enable this during development
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
