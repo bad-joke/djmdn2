@@ -41,3 +41,55 @@ class Book(models.Model):
         """
         return reverse('book-detail', args=[str(self.id)])
     
+import uuid # for uniqueness
+
+class BookInstance(models.Model):
+    """
+    Specific copy of a book that can be borrowed
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="Unique ID for this book across the whole library")
+    # a copy cannot be two books at once
+    book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True)
+    imprint = models.CharField(max_length=200)
+    due_back = models.DateField(null=True, blank=True)
+    LOAN_STATUS = (
+        ('m', 'Maintenance'),
+        ('o', 'On Loan'),
+        ('a', 'Available'),
+        ('r', 'Reserved'),
+        ('p', 'Between Matter Phases'),
+        ('x', 'Trapped in Dimension X'),
+        ('k', 'Not Yet Provided By The Free Market')
+    )
+    
+    status = models.CharField(max_length=1, choices=LOAN_STATUS, blank=True, default='m', help_text='Book availability')
+    
+    class Meta:
+        ordering = ['due_back']
+        
+    def __str__(self):
+        """
+        String for representing the model object
+        """
+        return '%s (%s)' % (self.id, self.book.title)
+        
+class Author(models.Model):
+    """
+    An author of a book
+    """
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    date_of_birth = models.DateField(null=True, blank=True)
+    date_of_death = models.DateField('Died', null=True, blank=True)
+    
+    def get_absolute_url(self):
+        """
+        Returns the url to access a partiular instance of the author
+        """
+        return reverse('author-detail', args=[str(self.id)])
+        
+    def __str__(self):
+        """
+        String representing the model object
+        """
+        return '%s, %s' % (self.last_name, self.first_name) 
