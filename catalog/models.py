@@ -55,6 +55,13 @@ class Book(models.Model):
         """
         return reverse('book-detail', args=[str(self.id)])
     
+    def display_genre(self):
+        """
+        Returns first 3 genres in short description string so admin site can display 
+        """
+        return ', '.join([genre.name for genre in self.genre.all()[:3]])
+    display_genre.short_description = 'Hurf Blurf'
+    
 import uuid # for uniqueness
 
 class BookInstance(models.Model):
