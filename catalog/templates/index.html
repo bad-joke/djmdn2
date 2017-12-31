@@ -1,0 +1,17 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Local Library</h1>
+
+    <p>Welcome to the <em>Local Library</em>, where reading is <strong>FUN</strong>damental and also a privilege restricted to the upper classes and their hanger-ons. As if the lower classes would know what to do with it anyway!</p>
+    
+    <h2>Dynamic Content</h2>
+    <p>The library has the following record counts:</p>
+    <ul>
+        <li><strong>Books:</strong> {{ num_books }}</li>
+        <li><strong>Copies:</strong> {{ num_instances }}</li>
+        <li><strong>Copies Available:</strong> {{ num_instances_available }}</li>
+        <li><strong>Authors:</strong> {{ num_authors }}</li>
+    </ul>
+    
+    {% endblock %}
