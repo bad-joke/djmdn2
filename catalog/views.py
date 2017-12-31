@@ -21,3 +21,16 @@ def index(request):
         'index.html', 
         context = {'num_books':num_books, 'num_instances': num_instances, 'num_instances_available': num_instances_available, 'num_authors': num_authors, 'num_books_english': num_books_english},
     )
+    
+from django.views import generic
+
+class BookListView(generic.ListView):
+    model = Book
+    
+    # we could also just set the 'queryset' property but this gives us more flexibility
+    # only list top 5
+    def get_queryset(self):
+        return Book.objects.all()[:5]
+        
+class BookDetailView(generic.DetailView):
+    model =  Book
