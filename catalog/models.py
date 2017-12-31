@@ -86,6 +86,7 @@ class BookInstance(models.Model):
     status = models.CharField(max_length=1, choices=LOAN_STATUS, blank=True, default='m', help_text='Book availability')
     
     class Meta:
+        # can also specify in any class-based view that uses this
         ordering = ['due_back']
         
     def __str__(self):

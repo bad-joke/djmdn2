@@ -26,6 +26,7 @@ from django.views import generic
 
 class BookListView(generic.ListView):
     model = Book
+    paginate_by = 10
     
     # we could also just set the 'queryset' property but this gives us more flexibility
     # only list top 5
