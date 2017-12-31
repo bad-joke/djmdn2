@@ -13,10 +13,11 @@ def index(request):
     # Available books
     num_instances_available = BookInstance.objects.filter(status__exact='a').count()
     num_authors = Author.objects.all().count()
+    num_books_english = Book.objects.filter(language__name='English').count()
     
     # Render the HTML
     return render(
         request,
         'index.html', 
-        context = {'num_books':num_books, 'num_instances': num_instances, 'num_instances_available': num_instances_available, 'num_authors': num_authors},
+        context = {'num_books':num_books, 'num_instances': num_instances, 'num_instances_available': num_instances_available, 'num_authors': num_authors, 'num_books_english': num_books_english},
     )
