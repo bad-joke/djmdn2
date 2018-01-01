@@ -30,8 +30,20 @@ class BookListView(generic.ListView):
     
     # we could also just set the 'queryset' property but this gives us more flexibility
     # only list top 5
-    def get_queryset(self):
-        return Book.objects.all()[:5]
+    # (removing because we can paginate now)
+    #def get_queryset(self):
+    #    return Book.objects.all()[:5]
         
 class BookDetailView(generic.DetailView):
-    model =  Book
+    model = Book
+    paginate_by = 10
+    
+class AuthorListView(generic.ListView):
+    model = Author
+    paginate_by = 10
+    
+class AuthorDetailView(generic.DetailView):
+    model = Author
+    paginate_by = 10
+    
+    
