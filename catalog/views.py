@@ -15,11 +15,17 @@ def index(request):
     num_authors = Author.objects.all().count()
     num_books_english = Book.objects.filter(language__name='English').count()
     
+    # Number of visits to this view, counted in sessions variable
+    num_visits = request.session.get('num_visits', 0)
+    request.session['num_visits'] = num_visits + 1
+    
     # Render the HTML
     return render(
         request,
         'index.html', 
-        context = {'num_books':num_books, 'num_instances': num_instances, 'num_instances_available': num_instances_available, 'num_authors': num_authors, 'num_books_english': num_books_english},
+        context = {'num_books':num_books, 'num_instances': num_instances, 'num_instances_available': num_instances_available, 'num_authors': num_authors, 'num_books_english': num_books_english,
+            'num_visits': num_visits,
+        },
     )
     
 from django.views import generic
@@ -35,15 +41,15 @@ class BookListView(generic.ListView):
     #    return Book.objects.all()[:5]
         
 class BookDetailView(generic.DetailView):
-    model = Book
+    model = Book # shorthand for queryset = Book.objects.all()
     paginate_by = 10
     
 class AuthorListView(generic.ListView):
-    model = Author
+    model = Author # shorthand for queryset = Author.objects.all()
     paginate_by = 10
     
 class AuthorDetailView(generic.DetailView):
-    model = Author
+    model = Author # shorthand for queryset = Author.objects.all()
     paginate_by = 10
     
     
