@@ -26,11 +26,16 @@ urlpatterns += [
     url(r'^catalog/', include('catalog.urls')),
 ]
     
-    
 # keep this near the bottom... hard redirect to keep catalog as only app
 from django.views.generic import RedirectView
 urlpatterns += [
     url(r'^$', RedirectView.as_view(url='/catalog/', permanent=True)),
+]
+
+# Authentication 
+
+urlpatterns += [
+    url(r'^accounts/', include('django.contrib.auth.urls')),
 ]
 
 # django doesn't serve up static files by default, it's nice to
