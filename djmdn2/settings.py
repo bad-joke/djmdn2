@@ -32,15 +32,20 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
-INSTALLED_APPS = [
+USER_APPS = [
+    'catalog.apps.CatalogConfig',
+]
+
+BUILT_IN_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'catalog.apps.CatalogConfig',
 ]
+
+INSTALLED_APPS = USER_APPS + BUILT_IN_APPS
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
@@ -120,7 +125,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-
 STATIC_URL = '/static/'
 
 # Redirect to home page on successful login
@@ -128,3 +132,8 @@ LOGIN_REDIRECT_URL = '/'
 
 # To test email (our env blocks SMTP to prevent spammers)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+try:
+    from local_settings import *
+except:
+    pass
