@@ -64,6 +64,9 @@ class Book(models.Model):
     
 import uuid # for uniqueness
 
+from django.contrib.auth.models import User
+from datetime import date
+
 class BookInstance(models.Model):
     """
     Specific copy of a book that can be borrowed
@@ -84,6 +87,7 @@ class BookInstance(models.Model):
     )
     
     status = models.CharField(max_length=1, choices=LOAN_STATUS, blank=True, default='m', help_text='Book availability')
+    borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:
         # can also specify in any class-based view that uses this
@@ -94,6 +98,12 @@ class BookInstance(models.Model):
         String for representing the model object
         """
         return '%s (%s)' % (self.id, self.book.title)
+    
+    @property
+    def is_overdue(self):
+        if self.due_back and date.today() > self.due_back:
+            return True
+        return False
         
 class Author(models.Model):
     """
