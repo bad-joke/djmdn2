@@ -92,6 +92,7 @@ class BookInstance(models.Model):
     class Meta:
         # can also specify in any class-based view that uses this
         ordering = ['due_back']
+        permissions = (("can_mark_returned", "Set book as returned"),)
         
     def __str__(self):
         """
