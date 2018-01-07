@@ -122,16 +122,19 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
 from .models import Author
 
-class AuthorCreate(CreateView):
+class AuthorCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('catalog.add_author',)
     model = Author
     fields = '__all__'
     initial = { 'date_of_death': None, }
-    
-class AuthorUpdate(UpdateView):
+        
+class AuthorUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('catalog.change_author')
     model = Author
     fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death',]
     
-class AuthorDelete(DeleteView):
+class AuthorDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('catalog.delete_author')
     model = Author
     success_url = reverse_lazy('authors')
     
