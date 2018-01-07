@@ -129,12 +129,26 @@ class AuthorCreate(PermissionRequiredMixin, CreateView):
     initial = { 'date_of_death': None, }
         
 class AuthorUpdate(PermissionRequiredMixin, UpdateView):
-    permission_required = ('catalog.change_author')
+    permission_required = ('catalog.change_author',)
     model = Author
     fields = ['first_name', 'last_name', 'date_of_birth', 'date_of_death',]
     
 class AuthorDelete(PermissionRequiredMixin, DeleteView):
-    permission_required = ('catalog.delete_author')
+    permission_required = ('catalog.delete_author',)
     model = Author
     success_url = reverse_lazy('authors')
     
+class BookCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('catalog.add_book',)
+    model = Book
+    fields = '__all__'
+    
+class BookUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('catalog.change_book',)
+    model = Book
+    fields = '__all__'
+    
+class BookDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('catalog.delete_book',)
+    model = Book
+    success_url = reverse_lazy('books')
