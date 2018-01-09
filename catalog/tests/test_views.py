@@ -154,5 +154,82 @@ class LoanedBookInstancesByUserListViewTest(TestCase):
                 else:
                     self.assertTrue(last_date <= copy.due_back)
             
+from django.contrib.auth.models import Permission
         
+class RenewBookInstancesViewTest(TestCase):
+    
+    def setUp(self):
+        # create new user
+        test_user1 = User.objects.create_user(username='testuser1', password='12345')
+        test_user1.save()
         
+        test_user2 = User.objects.create_user(username='testuser2', password='12345')
+        test_user2.save()
+        
+        # give permissions to only one user
+        permission = Permission.objects.get(name='Renew book due date')
+        test_user2.user_permissions.add(permission)
+        test_user2.save()
+        
+        # create a book
+        test_author = Author.objects.create(first_name='Test', last_name='Author')
+        test_genre = Genre.objects.create(name='Fantasy')
+        test_language = Language.objects.create(name='Test Language')
+        test_book = Book.objects.create(title='Test Book Title', summary='A test book summary', isbn='1234567890123', 
+            author=test_author, language=test_language,)
+        # create genre as post step
+        genre_objects_for_book = Genre.objects.all()
+        test_book.genre.set(genre_objects_for_book)
+        test_book.save()
+        
+        # create book instance for test_user1
+        return_date = datetime.date.today()  + datetime.timedelta(days=5)
+        self.test_bookinstance1 = BookInstance.objects.create(book=test_book, imprint='Test Imprint', borrower=test_user1, status='o')
+        
+        # create book instance for test_user2
+        return_date = datetime.date.today() + datetime.timedelta(days=5)
+        self.test_bookinstance2 = BookInstance.objects.create(book=test_book, imprint='Test Imprint', borrower=test_user2, status='o')
+        
+    def test_redirect_if_not_logged_in(self):
+        resp = self.client.get(reverse('renew-book-librarian', kwargs={'pk':self.test_bookinstance1.pk,}))
+        # manually check redirect (can't use assertRedirect, because redirect URL is unpredictable)
+        self.assertEqual(resp.status_code, 302)
+        self.assertTrue(resp.url.startswith('/accounts/login/'))
+        
+    def test_redirect_if_logged_in_but_not_correct_permission(self):
+        login = self.client.login(username='testuser1', password='12345')
+        resp = self.client.get(reverse('renew-book-librarian', kwargs={'pk':self.test_bookinstance1.pk,}))
+        
+        # manually check redirect (can't use assertRedirect, because redirect URL is unpredictable)
+        self.assertEqual(resp.status_code, 302)
+        self.assertTrue(resp.url.startswith('/accounts/login/'))
+        
+    def test_logged_in_with_permission_borrowed_book(self):
+        login = self.client.login(username='testuser2', password='12345')
+        resp = self.client.get(reverse('renew-book-librarian', kwargs={'pk':self.test_bookinstance2.pk,}))
+        
+        # check that it lets us login - this is our book and we have the right permissions
+        self.assertEqual(resp.status_code, 200)
+        
+    def test_logged_in_with_permission_another_users_book(self):
+        login = self.client.login(username='testuser2', password='12345')
+        resp = self.client.get(reverse('renew-book-librarian', kwargs={'pk':self.test_bookinstance1.pk,}))
+        
+        # check that lets us view, since we're a librarian should be able to view any book
+        # (if needed, change librarian group permissions using admin site)
+        self.assertEqual(resp.status_code, 200)
+        
+    def test_HTTP404_for_invalid_book_if_logged_in(self):
+        import uuid
+        test_uid = uuid.uuid4() # unlikely we'll get a collision
+        login = self.client.login(username='testuser2', password='12345')
+        resp = self.client.get(reverse('renew-book-librarian', kwargs={'pk':test_uid,}))
+        self.assertEqual(resp.status_code, 404)
+        
+    def test_uses_correct_template(self):
+        login = self.client.login(username='testuser2', password='12345')
+        resp = self.client.get(reverse('renew-book-librarian', kwargs={'pk':self.test_bookinstance1.pk,}))
+        self.assertEqual(resp.status_code, 200)
+        
+        # check that we used the correct template
+        self.assertTemplateUsed(resp, 'catalog/book_renew_librarian.html')
