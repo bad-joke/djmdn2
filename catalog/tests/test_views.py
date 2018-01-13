@@ -167,7 +167,7 @@ class RenewBookInstancesViewTest(TestCase):
         test_user2.save()
         
         # give permissions to only one user
-        permission = Permission.objects.get(name='Renew book due date')
+        permission = Permission.objects.get(codename='can_renew')
         test_user2.user_permissions.add(permission)
         test_user2.save()
         
@@ -241,3 +241,12 @@ class RenewBookInstancesViewTest(TestCase):
         
         date_3_weeks_in_future = datetime.date.today() + datetime.timedelta(weeks=3)
         self.assertEqual(resp.context['form'].initial['renewal_date'], date_3_weeks_in_future)
+    
+    def test_redirects_to_all_borrowed_books_after_renewal(self):
+        login = self.client.login(username='testuser2', password='12345')
+        valid_date_in_future = datetime.date.today() + datetime.timedelta(weeks=2)
+        
+        resp = self.client.post(reverse('renew-book-librarian', kwargs={'pk':self.test_bookinstance1.pk,}),
+        {'renewal_date':valid_date_in_future})
+        
+        self.assertRedirects(resp, reverse('all-borrowed-books'))
